@@ -149,6 +149,8 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
     editable: boolean = true;
     @Input()
     noMatchesText: string = '';
+    @Input()
+    allowCustomValue: boolean = true;
 
     @Output()
     onQuery = new EventEmitter<string>();
@@ -375,7 +377,7 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
                 }
             }
             if (null === this.marked) {
-                if (this.forceSelection) {
+                if (this.forceSelection && !this.allowCustomValue) {
                     this.onSelect.emit(null);
                     this.sendModelChange(null);
                     this.clear();
@@ -448,6 +450,10 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
         let result: any = val;
 
         if (!this.valueField || !val) {
+            return val;
+        }
+
+        if (this.allowCustomValue && typeof val === "string") {
             return val;
         }
 
