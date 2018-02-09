@@ -9,5 +9,9 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "target": "es5"
-  }
+  },
+  "exclude": [
+    "demo",
+    "node_modules"
+  ]
 }
