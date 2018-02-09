@@ -12,13 +12,13 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
                    (keydown)="onKeyDown($event)"
                    (blur)="onFieldBlur($event)"
                    (focus)="onFieldFocus()">
-        
+
             <div class="icons">
                 <i *ngIf="loading" class="{{loadingIconClass}}"></i>
                 <i *ngIf="!loading && hideList" (click)="onTriggerClick()" class="{{triggerIconClass}}"></i>
                 <i *ngIf="!loading && !hideList" class="{{triggerIconClass}} up"></i>
             </div>
-        
+
             <div class="list" *ngIf="data && !hideList" (mouseenter)="onMouseEnterList($event)" (mouseleave)="onMouseLeaveList($event)">
                 <div class="no-matches" *ngIf="noMatchesText && data.length == 0">{{noMatchesText}}</div>
                 <div *ngFor="let item of data;let index = index;"
@@ -33,7 +33,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
         .field-wrap {
             position: relative;
         }
-                
+
         .list {
             position: absolute;
             width: 100%;
@@ -44,7 +44,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
             max-height: 200px;
             overflow: auto;
         }
-        
+
         .list .no-matches {
             padding: 10px 20px;
             cursor: default;
@@ -56,27 +56,27 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
             padding: 10px 20px;
             cursor: pointer;
         }
-        
+
         .list .item.marked,
         .list .item:hover{
             background-color: #ecf0f5;
         }
-        
+
         .list .item.marked {
             font-weight: bold;
         }
-        
+
         .list .item.disabled {
             opacity: .5;
         }
-        
+
         .icons {
             position: absolute;
             right: 8px;
             top: 0px;
             height: 100%;
         }
-        
+
         .icons i {
             height: 20px;
             width: 20px;
@@ -87,12 +87,12 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
             right: 0;
             margin: auto auto auto -20px;
         }
-        
+
         .loader {
             background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0nMzhweCcgaGVpZ2h0PSczOHB4JyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCIgY2xhc3M9InVpbC1yZWxvYWQiPgogICAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9Im5vbmUiIGNsYXNzPSJiayI+PC9yZWN0PgogICAgPGc+CiAgICAgICAgPHBhdGggZD0iTTUwIDE1QTM1IDM1IDAgMSAwIDc0Ljc4NyAyNS4yMTMiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgzOCwzOCwzOCwwLjkzKSIgc3Ryb2tlLXdpZHRoPSIxMnB4Ij48L3BhdGg+CiAgICAgICAgPHBhdGggZD0iTTUwIDBMNTAgMzBMNjYgMTVMNTAgMCIgZmlsbD0icmdiYSgzOCwzOCwzOCwwLjkzKSI+PC9wYXRoPgogICAgICAgIDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9InRyYW5zZm9ybSIgdHlwZT0icm90YXRlIiBmcm9tPSIwIDUwIDUwIiB0bz0iMzYwIDUwIDUwIiBkdXI9IjFzIiByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSI+PC9hbmltYXRlVHJhbnNmb3JtPgogICAgPC9nPgo8L3N2Zz4=');
             background-size: cover;
         }
-        
+
         .trigger {
             background-size: contain;
             background-repeat: no-repeat;
@@ -102,7 +102,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
         }
 
         .trigger.up {
-            transform: rotate(180deg);    
+            transform: rotate(180deg);
         }
 
         input::-ms-clear {
@@ -149,6 +149,8 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
     editable: boolean = true;
     @Input()
     noMatchesText: string = '';
+    @Input()
+    allowCustomValue: boolean = true;
 
     @Output()
     onQuery = new EventEmitter<string>();
@@ -375,7 +377,7 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
                 }
             }
             if (null === this.marked) {
-                if (this.forceSelection) {
+                if (this.forceSelection && !this.allowCustomValue) {
                     this.onSelect.emit(null);
                     this.sendModelChange(null);
                     this.clear();
@@ -448,6 +450,10 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
         let result: any = val;
 
         if (!this.valueField || !val) {
+            return val;
+        }
+
+        if (this.allowCustomValue && typeof val === "string") {
             return val;
         }
 
