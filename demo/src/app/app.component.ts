@@ -5,7 +5,7 @@ import { Component } from '@angular/core';
     templateUrl: './app.component.html'
 })
 export class AppComponent {
-    value:any;
+    value = 'value2';
     allowCustomValue:boolean = false;
     comboConstants:Array<Object> = [
         {id: 'value1', text: 'value1'},
