@@ -224,7 +224,7 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
     set currVal(value: string) {
         this._currVal = value;
         this._tmpVal = null;
-        this.marked = null;
+        this.marked = this.searchMarkedIndex(value);
         this.hideList = !this._hasFocus && !this._noBlur;
 
         clearTimeout(this._aheadTimer);
@@ -252,9 +252,10 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
 
     private scrollToMarkedElement() {
         let el = this.scrollElement.nativeElement.querySelector(`.list .item:nth-child(${this.marked + 1})`);
-
         let alignToTop = false;
-        el.scrollIntoView(alignToTop);
+        if (el !== null) {
+            el.scrollIntoView(alignToTop);
+        }
     }
 
     get marked(): number {
@@ -490,14 +491,23 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
     }
 
     private searchValueObject(value: any): any {
-        if (false === value instanceof Object && this.valueField && this._initialData) {
-            this._initialData.forEach((item) => {
-                if (value === this.getValueValue(item)) {
-                    value = item;
-                }
-            });
+        let result:any;
+        if (value !== null && this.valueField && this._initialData) {
+            result = this._initialData.find((item) => this.isValueEqualToListItem(value, item));
         }
-        return value;
+        return result ? result : value;
+    }
+
+    private searchMarkedIndex(value: any): any {
+        let result:any;
+        if (value !== null && this.valueField && this._initialData) {
+            result = this._initialData.findIndex((item) => this.isValueEqualToListItem(value, item));
+        }
+        return result !== -1 ? result : null;
+    }
+
+    private isValueEqualToListItem(value:any, listItem:any):boolean {
+        return (false === value instanceof Object && value === this.getValueValue(listItem)) || JSON.stringify(value) === JSON.stringify(listItem);
     }
 
     onTriggerClick() {
@@ -509,14 +519,16 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
     }
 
     writeValue(value: any): void {
-        value = this.searchValueObject(value);
-
-        if (value instanceof Object && this.getDisplayValue(value)) {
-            this.currVal = this.getDisplayValue(value);
+        let valueObject = this.searchValueObject(value);
+        let displayValue = null;
+        if (valueObject instanceof Object) {
+            displayValue = this.getDisplayValue(valueObject);
+        }
+        if (displayValue) {
+            this.currVal = displayValue;
         } else {
             this._tmpVal = value;
         }
-
         this.onInitValue.emit(value);
     }
 
