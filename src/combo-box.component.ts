@@ -527,6 +527,9 @@ export class ComboBoxComponent implements ControlValueAccessor, OnInit {
         if (displayValue) {
             this.currVal = displayValue;
         } else {
+            if (typeof value === "string") {
+                this.currVal = value;
+            }
             this._tmpVal = value;
         }
         this.onInitValue.emit(value);
